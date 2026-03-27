@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action, query } from "./_generated/server";
+import { action } from "./_generated/server";
 import { components } from "./_generated/api";
 
 // Simulate a login attempt — rate limited to 5 per minute per user
@@ -37,7 +37,7 @@ export const aiRequest = action({
 });
 
 // Peek at current quota without consuming a slot
-export const getStatus = query({
+export const getStatus = action({
   args: { userId: v.string(), type: v.union(v.literal("login"), v.literal("ai")) },
   returns: v.object({
     remaining: v.number(),
