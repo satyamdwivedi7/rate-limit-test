@@ -1,7 +1,7 @@
 "use client";
 
-import { useAction, useQuery } from "convex/react";
-import { useState } from "react";
+import { useAction } from "convex/react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../convex/_generated/api";
 
 type Result = { allowed: boolean; remaining: number; resetAt: number };
@@ -17,31 +17,33 @@ function RateLimitCard({
   description,
   limit,
   actionFn,
-  statusQuery,
   userId,
 }: {
   title: string;
   description: string;
   limit: number;
   actionFn: (args: { userId: string }) => Promise<Result>;
-  statusQuery: { remaining: number; resetAt: number | null } | undefined;
   userId: string;
 }) {
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     setLoading(true);
+    setError(null);
     try {
       const r = await actionFn({ userId });
       setResult(r);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
     }
   }
 
-  const remaining = result?.remaining ?? statusQuery?.remaining ?? limit;
-  const resetAt = result?.resetAt ?? statusQuery?.resetAt ?? null;
+  const remaining = result?.remaining ?? limit;
+  const resetAt = result?.resetAt ?? null;
   const allowed = result?.allowed ?? true;
   const pct = (remaining / limit) * 100;
   const barColor = pct > 50 ? "#22c55e" : pct > 20 ? "#f59e0b" : "#ef4444";
@@ -96,6 +98,19 @@ function RateLimitCard({
         </div>
       )}
 
+      {error && (
+        <div style={{
+          background: "#230e0e",
+          border: "1px solid #ef444430",
+          borderRadius: 8,
+          padding: "10px 14px",
+          fontSize: 13,
+          color: "#fca5a5",
+        }}>
+          ✗ {error}
+        </div>
+      )}
+
       <button
         onClick={handleClick}
         disabled={loading}
@@ -117,13 +132,33 @@ function RateLimitCard({
   );
 }
 
+function useSessionUserId() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    const stored = localStorage.getItem("demo-user-id");
+    if (stored) {
+      setUserId(stored);
+    } else {
+      const id = "demo-" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("demo-user-id", id);
+      setUserId(id);
+    }
+  }, []);
+
+  return userId;
+}
+
 export default function Home() {
-  const userId = "demo-user";
+  const userId = useSessionUserId();
 
   const loginAction = useAction(api.actions.loginAttempt);
   const aiAction = useAction(api.actions.aiRequest);
-  const loginStatus = useQuery(api.actions.getStatus, { userId, type: "login" });
-  const aiStatus = useQuery(api.actions.getStatus, { userId, type: "ai" });
+
+  if (!userId) return null;
 
   return (
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "60px 24px" }}>
@@ -156,7 +191,6 @@ export default function Home() {
           description="5 attempts per minute. Protects login endpoints from brute force."
           limit={5}
           actionFn={loginAction}
-          statusQuery={loginStatus}
           userId={userId}
         />
         <RateLimitCard
@@ -164,7 +198,6 @@ export default function Home() {
           description="10 requests per hour. Enforces per-user AI usage limits."
           limit={10}
           actionFn={aiAction}
-          statusQuery={aiStatus}
           userId={userId}
         />
       </div>

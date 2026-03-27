@@ -2,6 +2,11 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { components } from "./_generated/api";
 
+const RATE_LIMITS = {
+  login: { limit: 5, window: "1m" as const },
+  ai: { limit: 10, window: "1h" as const },
+} as const;
+
 // Simulate a login attempt — rate limited to 5 per minute per user
 export const loginAttempt = action({
   args: { userId: v.string() },
@@ -13,8 +18,7 @@ export const loginAttempt = action({
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.rateLimiter.rateLimits.checkRateLimit, {
       key: "login:" + args.userId,
-      limit: 5,
-      window: "1m",
+      ...RATE_LIMITS.login,
     });
   },
 });
@@ -30,8 +34,7 @@ export const aiRequest = action({
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.rateLimiter.rateLimits.checkRateLimit, {
       key: "ai:" + args.userId,
-      limit: 10,
-      window: "1h",
+      ...RATE_LIMITS.ai,
     });
   },
 });
@@ -44,9 +47,10 @@ export const getStatus = action({
     resetAt: v.union(v.number(), v.null()),
   }),
   handler: async (ctx, args) => {
-    const key = args.type === "login" ? "login:" + args.userId : "ai:" + args.userId;
-    const limit = args.type === "login" ? 5 : 10;
-    const window = args.type === "login" ? "1m" : "1h";
-    return await ctx.runQuery(components.rateLimiter.rateLimits.peek, { key, limit, window });
+    const cfg = RATE_LIMITS[args.type];
+    return await ctx.runQuery(components.rateLimiter.rateLimits.peek, {
+      key: args.type + ":" + args.userId,
+      ...cfg,
+    });
   },
 });
