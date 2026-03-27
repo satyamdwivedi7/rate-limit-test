@@ -216,12 +216,13 @@ export default function Home() {
           lineHeight: 1.7,
           overflowX: "auto",
         }}>{`// Wire up in convex/convex.config.ts
+import rateLimiter from "convex-rate-limiter/convex.config.js";
 const app = defineApp();
 app.use(rateLimiter);
 
 // Use in any action
 const result = await ctx.runMutation(
-  components.rateLimiter.rateLimits.checkRateLimit,
+  components.rateLimiter.convex.rateLimits.checkRateLimit,
   { key: "login:" + userId, limit: 5, window: "1m" }
 );
 // { allowed: true, remaining: 4, resetAt: 1712345678000 }`}</pre>

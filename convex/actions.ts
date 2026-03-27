@@ -16,7 +16,7 @@ export const loginAttempt = action({
     resetAt: v.number(),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.rateLimiter.rateLimits.checkRateLimit, {
+    return await ctx.runMutation(components.rateLimiter.convex.rateLimits.checkRateLimit, {
       key: "login:" + args.userId,
       ...RATE_LIMITS.login,
     });
@@ -32,7 +32,7 @@ export const aiRequest = action({
     resetAt: v.number(),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.rateLimiter.rateLimits.checkRateLimit, {
+    return await ctx.runMutation(components.rateLimiter.convex.rateLimits.checkRateLimit, {
       key: "ai:" + args.userId,
       ...RATE_LIMITS.ai,
     });
@@ -48,7 +48,7 @@ export const getStatus = action({
   }),
   handler: async (ctx, args) => {
     const cfg = RATE_LIMITS[args.type];
-    return await ctx.runQuery(components.rateLimiter.rateLimits.peek, {
+    return await ctx.runQuery(components.rateLimiter.convex.rateLimits.peek, {
       key: args.type + ":" + args.userId,
       ...cfg,
     });
