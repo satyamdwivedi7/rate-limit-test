@@ -47,28 +47,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  rateLimiter: {
-    convex: {
-      rateLimits: {
-        checkRateLimit: FunctionReference<
-          "mutation",
-          "internal",
-          { key: string; limit: number; window: string },
-          { allowed: boolean; remaining: number; resetAt: number }
-        >;
-        enforceRateLimit: FunctionReference<
-          "mutation",
-          "internal",
-          { key: string; limit: number; window: string },
-          { remaining: number; resetAt: number }
-        >;
-        peek: FunctionReference<
-          "query",
-          "internal",
-          { key: string; limit: number; window: string },
-          { remaining: number; resetAt: number | null }
-        >;
-      };
-    };
-  };
+  rateLimiter: {};
 };
