@@ -32,11 +32,15 @@ function CheckCard({ userId }: { userId: string }) {
   const loginAttempt = useAction(api.actions.loginAttempt);
   const [result, setResult] = useState<{ allowed: boolean; remaining: number; resetAt: number } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     setLoading(true);
+    setError(null);
     try {
       setResult(await loginAttempt({ userId }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
     }
@@ -66,6 +70,12 @@ function CheckCard({ userId }: { userId: string }) {
         </>
       )}
 
+      {error && (
+        <div style={{ background: "#230e0e", border: "1px solid #ef444430", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#fca5a5" }}>
+          ✗ {error}
+        </div>
+      )}
+
       <button onClick={handleClick} disabled={loading} style={{ background: loading ? "#2a2a2a" : "#f97316", color: "#fff", border: "none", borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
         {loading ? "Sending…" : "Send Login Request"}
       </button>
@@ -83,11 +93,15 @@ function EnforceCard({ userId }: { userId: string }) {
   const enforceAttempt = useAction(api.actions.enforceAttempt);
   const [result, setResult] = useState<EnforceResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     setLoading(true);
+    setError(null);
     try {
       setResult(await enforceAttempt({ userId }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
     }
@@ -119,6 +133,12 @@ function EnforceCard({ userId }: { userId: string }) {
         </>
       )}
 
+      {error && (
+        <div style={{ background: "#230e0e", border: "1px solid #ef444430", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#fca5a5" }}>
+          ✗ {error}
+        </div>
+      )}
+
       <button onClick={handleClick} disabled={loading} style={{ background: loading ? "#2a2a2a" : "#a78bfa", color: "#fff", border: "none", borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
         {loading ? "Sending…" : "Send Guarded Request"}
       </button>
@@ -132,11 +152,15 @@ function PeekCard({ userId }: { userId: string }) {
   const getStatus = useAction(api.actions.getStatus);
   const [status, setStatus] = useState<{ remaining: number; resetAt: number | null } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     setLoading(true);
+    setError(null);
     try {
       setStatus(await getStatus({ userId, type: "login" }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
     }
@@ -167,6 +191,12 @@ function PeekCard({ userId }: { userId: string }) {
             {`{ remaining: ${status.remaining}, resetAt: ${status.resetAt ?? "null"} }`}
           </div>
         </>
+      )}
+
+      {error && (
+        <div style={{ background: "#230e0e", border: "1px solid #ef444430", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#fca5a5" }}>
+          ✗ {error}
+        </div>
       )}
 
       <button onClick={handleClick} disabled={loading} style={{ background: loading ? "#2a2a2a" : "#38bdf8", color: "#0a0a0a", border: "none", borderRadius: 8, padding: "12px 20px", fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
