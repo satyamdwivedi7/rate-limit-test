@@ -15,6 +15,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type { ComponentApi } from "convex-rate-limiter/_generated/component";
 
 declare const fullApi: ApiFromModules<{
   actions: typeof actions;
@@ -47,5 +48,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  rateLimiter: {};
+  rateLimiter: ComponentApi<"rateLimiter">;
 };
