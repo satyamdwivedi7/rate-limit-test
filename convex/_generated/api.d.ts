@@ -52,19 +52,31 @@ export declare const components: {
       checkRateLimit: FunctionReference<
         "mutation",
         "internal",
-        { key: string; limit: number; window: string },
+        {
+          key: string;
+          limit: number;
+          window: "1m" | "5m" | "15m" | "1h" | "6h" | "24h" | "7d";
+        },
         { allowed: boolean; remaining: number; resetAt: number }
       >;
       enforceRateLimit: FunctionReference<
         "mutation",
         "internal",
-        { key: string; limit: number; window: string },
+        {
+          key: string;
+          limit: number;
+          window: "1m" | "5m" | "15m" | "1h" | "6h" | "24h" | "7d";
+        },
         { remaining: number; resetAt: number }
       >;
       peek: FunctionReference<
         "query",
         "internal",
-        { key: string; limit: number; window: string },
+        {
+          key: string;
+          limit: number;
+          window: "1m" | "5m" | "15m" | "1h" | "6h" | "24h" | "7d";
+        },
         { remaining: number; resetAt: number | null }
       >;
     };

@@ -228,7 +228,11 @@ function useSessionUserId() {
 
 export default function Home() {
   const userId = useSessionUserId();
-  if (!userId) return null;
+  if (!userId) return (
+    <main style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
+      <div style={{ color: "#555", fontSize: 14 }}>Loading…</div>
+    </main>
+  );
 
   return (
     <main style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
