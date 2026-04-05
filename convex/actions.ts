@@ -26,18 +26,11 @@ export const loginAttempt = action({
 // enforceRateLimit — throws ConvexError on limit exceeded; action catches and returns structured result
 export const enforceAttempt = action({
   args: { userId: v.string() },
-  returns: v.union(
-    v.object({
-      rateLimited: v.literal(false),
-      remaining: v.number(),
-      resetAt: v.number(),
-    }),
-    v.object({
-      rateLimited: v.literal(true),
-      remaining: v.literal(0),
-      resetAt: v.number(),
-    })
-  ),
+  returns: v.object({
+    rateLimited: v.boolean(),
+    remaining: v.number(),
+    resetAt: v.number(),
+  }),
   handler: async (ctx, args) => {
     try {
       const result = await ctx.runMutation(

@@ -84,9 +84,7 @@ function CheckCard({ userId }: { userId: string }) {
 }
 
 // Card 2: enforceRateLimit
-type EnforceResult =
-  | { rateLimited: false; remaining: number; resetAt: number }
-  | { rateLimited: true; remaining: 0; resetAt: number };
+type EnforceResult = { rateLimited: boolean; remaining: number; resetAt: number };
 
 function EnforceCard({ userId }: { userId: string }) {
   const LIMIT = 3;
