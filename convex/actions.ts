@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { action } from "./_generated/server";
 import { components } from "./_generated/api";
 
@@ -46,12 +46,14 @@ export const enforceAttempt = action({
       );
       return { rateLimited: false as const, ...result };
     } catch (e: any) {
-      if (e?.data?.code === "RATE_LIMITED") {
-        return {
-          rateLimited: true as const,
-          remaining: 0 as const,
-          resetAt: e.data.resetAt as number,
-        };
+      // ConvexError from a component mutation: check both instanceof and raw data shape
+      // (serialization across component boundaries can vary between dev and prod)
+      const isConvexRateLimit =
+        (e instanceof ConvexError && (e.data as any)?.code === "RATE_LIMITED") ||
+        e?.data?.code === "RATE_LIMITED";
+      if (isConvexRateLimit) {
+        const resetAt = (e instanceof ConvexError ? (e.data as any)?.resetAt : e?.data?.resetAt) as number;
+        return { rateLimited: true as const, remaining: 0 as const, resetAt };
       }
       throw e;
     }
